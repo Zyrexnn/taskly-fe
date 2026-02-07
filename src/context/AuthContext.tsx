@@ -2,12 +2,13 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from '../services/api';
 import { authApi } from '../services/api';
+import Cookies from 'js-cookie';
 
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (email: string, password: string) => Promise<{ success: boolean; message: string }>;
+    login: (username: string, password: string) => Promise<{ success: boolean; message: string }>;
     register: (name: string, email: string, password: string) => Promise<{ success: boolean; message: string }>;
     logout: () => void;
 }
@@ -27,16 +28,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         } catch (error) {
             console.error('Auth initialization error:', error);
-            localStorage.removeItem('token');
+            Cookies.remove('token');
             localStorage.removeItem('user');
         } finally {
             setIsLoading(false);
         }
     }, []);
 
-    const login = async (email: string, password: string) => {
+    const login = async (username: string, password: string) => {
         try {
-            const response = await authApi.login({ email, password });
+            const response = await authApi.login({ username, password });
             if (response.success && response.data) {
                 setUser(response.data.user);
                 return { success: true, message: response.message };

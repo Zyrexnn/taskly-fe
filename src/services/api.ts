@@ -1,8 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
 
 // API Base Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'https://api-taskly.fachry.dev/api';
 
 // Create Axios Instance
 const api = axios.create({
@@ -15,7 +16,7 @@ const api = axios.create({
 // Request Interceptor - Add JWT Token
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('token');
+        const token = Cookies.get('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -29,7 +30,7 @@ api.interceptors.response.use(
     (response) => response,
     (error: AxiosError) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('token');
+            Cookies.remove('token');
             localStorage.removeItem('user');
             window.location.href = '/login';
         }
@@ -64,7 +65,7 @@ export interface RegisterRequest {
 }
 
 export interface LoginRequest {
-    email: string;
+    username: string;
     password: string;
 }
 
@@ -140,14 +141,14 @@ export const authApi = {
     login: async (data: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
         const response = await api.post<ApiResponse<LoginResponse>>('/user/login', data);
         if (response.data.success && response.data.data) {
-            localStorage.setItem('token', response.data.data.token);
+            Cookies.set('token', response.data.data.token, { expires: 7 });
             localStorage.setItem('user', JSON.stringify(response.data.data.user));
         }
         return response.data;
     },
 
     logout: () => {
-        localStorage.removeItem('token');
+        Cookies.remove('token');
         localStorage.removeItem('user');
     },
 
@@ -157,7 +158,7 @@ export const authApi = {
     },
 
     isAuthenticated: (): boolean => {
-        return !!localStorage.getItem('token');
+        return !!Cookies.get('token');
     },
 };
 

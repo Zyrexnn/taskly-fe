@@ -80,21 +80,21 @@
 .logo-text {
     font-size: 2rem;
     font-weight: 800;
-    color: white;
+    color: rgb(3, 3, 3);
     letter-spacing: -0.02em;
 }
 
 .auth-tagline {
     font-size: 2.25rem;
     font-weight: 700;
-    color: white;
+    color: rgb(0, 0, 0);
     line-height: 1.2;
     margin-bottom: 1rem;
 }
 
 .auth-description {
     font-size: 1.05rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(0, 0, 0, 0.85);
     line-height: 1.6;
     margin-bottom: 2.5rem;
 }
@@ -110,7 +110,7 @@
     align-items: center;
     gap: 0.75rem;
     font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(0, 0, 0, 0.9);
 }
 
 .feature-icon {

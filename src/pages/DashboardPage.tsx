@@ -29,6 +29,23 @@ export default function DashboardPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    const getlistTask = async () => {
+        try {
+            const response = await taskApi.getAll();
+            if (response.success && response.data) {
+                setTasks(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch tasks:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+
+
+
+
     useEffect(() => {
         fetchTasks();
     }, []);

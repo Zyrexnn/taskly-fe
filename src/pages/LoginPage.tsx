@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, LogIn, Loader2, AlertCircle } from 'lucide-react';
+import { User as UserIcon, Lock, LogIn, Loader2, AlertCircle } from 'lucide-react';
 import './Auth.css';
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,7 @@ export default function LoginPage() {
         setError('');
         setIsLoading(true);
 
-        const result = await login(email, password);
+        const result = await login(username, password);
 
         if (result.success) {
             navigate('/dashboard');
@@ -78,15 +78,15 @@ export default function LoginPage() {
 
                         <form onSubmit={handleSubmit} className="auth-form">
                             <div className="form-group">
-                                <label htmlFor="email">Email Address</label>
+                                <label htmlFor="username">Username / NIS</label>
                                 <div className="input-with-icon">
-                                    <Mail className="input-icon" size={18} />
+                                    <UserIcon className="input-icon" size={18} />
                                     <input
-                                        id="email"
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        id="username"
+                                        type="text"
+                                        placeholder="Enter your username or NIS"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                         required
                                     />
                                 </div>
@@ -127,12 +127,7 @@ export default function LoginPage() {
                             </button>
                         </form>
 
-                        <div className="auth-footer">
-                            <p>
-                                Don't have an account?{' '}
-                                <Link to="/register" className="auth-link">Create one</Link>
-                            </p>
-                        </div>
+
                     </div>
                 </div>
             </div>

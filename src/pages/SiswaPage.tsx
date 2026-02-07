@@ -13,16 +13,20 @@ import {
     Menu,
     ChevronRight,
     Search,
-    ChevronLeft,
-    User,
-    Mail,
-    Phone,
-    MapPin,
-    Calendar,
-    GraduationCap
+    ChevronLeft
 } from 'lucide-react';
 import type { Siswa, CreateSiswaRequest } from '../services/api';
 import { siswaApi } from '../services/api';
+import { Button } from '../components/ui/button';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "../components/ui/table";
+import SiswaDialog from '../components/SiswaDialog';
 import './Dashboard.css';
 import './Siswa.css';
 
@@ -32,7 +36,6 @@ export default function SiswaPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingSiswa, setEditingSiswa] = useState<Siswa | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Pagination & Search
@@ -42,20 +45,6 @@ export default function SiswaPage() {
     const [totalPages, setTotalPages] = useState(0);
     const [search, setSearch] = useState('');
     const [searchDebounce, setSearchDebounce] = useState('');
-
-    // Form Data
-    const [formData, setFormData] = useState<CreateSiswaRequest>({
-        nis: '',
-        nama: '',
-        jenis_kelamin: 'L',
-        tempat_lahir: '',
-        tanggal_lahir: '',
-        alamat: '',
-        no_telepon: '',
-        email: '',
-        kelas: '',
-        tahun_masuk: new Date().getFullYear()
-    });
 
     // Debounce search
     useEffect(() => {
@@ -86,28 +75,13 @@ export default function SiswaPage() {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        try {
-            if (editingSiswa) {
-                const response = await siswaApi.update(editingSiswa.id, formData);
-                if (response.success) {
-                    fetchSiswa();
-                }
-            } else {
-                const response = await siswaApi.create(formData);
-                if (response.success) {
-                    fetchSiswa();
-                }
-            }
-            closeModal();
-        } catch (error) {
-            console.error('Failed to save siswa:', error);
-        } finally {
-            setIsSubmitting(false);
+    const handleSiswaSubmit = async (formData: CreateSiswaRequest) => {
+        if (editingSiswa) {
+            await siswaApi.update(editingSiswa.id, formData);
+        } else {
+            await siswaApi.create(formData);
         }
+        fetchSiswa();
     };
 
     const handleDelete = async (id: number) => {
@@ -125,41 +99,12 @@ export default function SiswaPage() {
 
     const openCreateModal = () => {
         setEditingSiswa(null);
-        setFormData({
-            nis: '',
-            nama: '',
-            jenis_kelamin: 'L',
-            tempat_lahir: '',
-            tanggal_lahir: '',
-            alamat: '',
-            no_telepon: '',
-            email: '',
-            kelas: '',
-            tahun_masuk: new Date().getFullYear()
-        });
         setShowModal(true);
     };
 
     const openEditModal = (siswa: Siswa) => {
         setEditingSiswa(siswa);
-        setFormData({
-            nis: siswa.nis,
-            nama: siswa.nama,
-            jenis_kelamin: siswa.jenis_kelamin,
-            tempat_lahir: siswa.tempat_lahir || '',
-            tanggal_lahir: siswa.tanggal_lahir ? siswa.tanggal_lahir.split('T')[0] : '',
-            alamat: siswa.alamat || '',
-            no_telepon: siswa.no_telepon || '',
-            email: siswa.email || '',
-            kelas: siswa.kelas || '',
-            tahun_masuk: siswa.tahun_masuk || new Date().getFullYear()
-        });
         setShowModal(true);
-    };
-
-    const closeModal = () => {
-        setShowModal(false);
-        setEditingSiswa(null);
     };
 
     return (
@@ -213,309 +158,156 @@ export default function SiswaPage() {
                         <Menu size={24} />
                     </button>
                     <div>
-                        <h1>Data Siswa</h1>
-                        <p className="header-subtitle">Kelola data siswa dengan mudah</p>
+                        <h1 className="text-3xl font-bold text-foreground">Data Siswa</h1>
+                        <p className="text-muted-foreground">Kelola data siswa dengan mudah</p>
                     </div>
-                    <button className="btn btn-primary" onClick={openCreateModal}>
+                    <Button onClick={openCreateModal} className="gap-2">
                         <Plus size={20} />
                         <span>Tambah Siswa</span>
-                    </button>
+                    </Button>
                 </header>
 
                 {/* Search & Stats */}
-                <div className="siswa-header">
-                    <div className="search-box">
-                        <Search className="search-box-icon" size={20} />
+                <div className="siswa-header mb-6 flex items-center justify-between gap-4">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
                         <input
                             type="text"
                             placeholder="Cari berdasarkan nama atau NIS..."
+                            className="w-full pl-10 pr-4 py-2 bg-background border rounded-md focus:ring-2 focus:ring-primary/20 outline-none"
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
-                    <div className="siswa-stats">
-                        <span>Total: <strong>{total}</strong> siswa</span>
+                    <div className="text-sm text-muted-foreground">
+                        Total: <span className="font-bold text-primary">{total}</span> siswa
                     </div>
                 </div>
 
-                {/* Table */}
-                <section className="siswa-section">
+                {/* Table Section */}
+                <section className="bg-card border rounded-lg overflow-hidden shadow-sm">
                     {isLoading ? (
-                        <div className="loading-state">
-                            <Loader2 className="spinner-lg spinning" />
+                        <div className="flex flex-col items-center justify-center py-20 gap-4 text-muted-foreground">
+                            <Loader2 className="animate-spin h-10 w-10 text-primary" />
                             <p>Memuat data siswa...</p>
                         </div>
                     ) : siswaList.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">👨‍🎓</div>
-                            <h4 className="empty-state-title">Belum ada data siswa</h4>
-                            <p>Mulai tambahkan data siswa pertama Anda</p>
-                            <button className="btn btn-primary mt-3" onClick={openCreateModal}>
+                        <div className="flex flex-col items-center justify-center py-20 text-center text-muted-foreground">
+                            <Users size={64} className="opacity-20 mb-4" />
+                            <h4 className="text-lg font-semibold text-foreground">Belum ada data siswa</h4>
+                            <p className="mb-6">Mulai tambahkan data siswa pertama Anda</p>
+                            <Button onClick={openCreateModal} className="gap-2">
                                 <Plus size={20} />
                                 Tambah Siswa
-                            </button>
+                            </Button>
                         </div>
                     ) : (
-                        <>
-                            <div className="table-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>NIS</th>
-                                            <th>Nama</th>
-                                            <th>L/P</th>
-                                            <th>Kelas</th>
-                                            <th>No. Telepon</th>
-                                            <th>Tahun Masuk</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {siswaList.map((siswa) => (
-                                            <tr key={siswa.id}>
-                                                <td><strong>{siswa.nis}</strong></td>
-                                                <td>{siswa.nama}</td>
-                                                <td>
-                                                    <span className={`badge ${siswa.jenis_kelamin === 'L' ? 'badge-info' : 'badge-warning'}`}>
-                                                        {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
-                                                    </span>
-                                                </td>
-                                                <td>{siswa.kelas || '-'}</td>
-                                                <td>{siswa.no_telepon || '-'}</td>
-                                                <td>{siswa.tahun_masuk || '-'}</td>
-                                                <td>
-                                                    <div className="table-actions">
-                                                        <button
-                                                            className="btn btn-icon btn-secondary"
-                                                            onClick={() => openEditModal(siswa)}
-                                                            title="Edit"
-                                                        >
-                                                            <Edit2 size={16} />
-                                                        </button>
-                                                        <button
-                                                            className="btn btn-icon btn-danger"
-                                                            onClick={() => handleDelete(siswa.id)}
-                                                            title="Hapus"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <div className="pagination">
-                                    <button
-                                        className="pagination-btn"
-                                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                                        disabled={page === 1}
-                                    >
-                                        <ChevronLeft size={18} />
-                                    </button>
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                                        <button
-                                            key={p}
-                                            className={`pagination-btn ${page === p ? 'active' : ''}`}
-                                            onClick={() => setPage(p)}
-                                        >
-                                            {p}
-                                        </button>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-[120px]">NIS</TableHead>
+                                        <TableHead>Nama</TableHead>
+                                        <TableHead>L/P</TableHead>
+                                        <TableHead>Kelas</TableHead>
+                                        <TableHead className="hidden md:table-cell">No. Telepon</TableHead>
+                                        <TableHead className="hidden md:table-cell">Tahun Masuk</TableHead>
+                                        <TableHead className="text-right">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {siswaList.map((siswa) => (
+                                        <TableRow key={siswa.id} className="group">
+                                            <TableCell className="font-bold">{siswa.nis}</TableCell>
+                                            <TableCell>{siswa.nama}</TableCell>
+                                            <TableCell>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${siswa.jenis_kelamin === 'L'
+                                                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                                        : 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
+                                                    }`}>
+                                                    {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                                                </span>
+                                            </TableCell>
+                                            <TableCell>{siswa.kelas || '-'}</TableCell>
+                                            <TableCell className="hidden md:table-cell text-muted-foreground">{siswa.no_telepon || '-'}</TableCell>
+                                            <TableCell className="hidden md:table-cell text-muted-foreground">{siswa.tahun_masuk || '-'}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => openEditModal(siswa)}
+                                                        className="h-8 w-8 text-muted-foreground hover:text-primary"
+                                                    >
+                                                        <Edit2 size={16} />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleDelete(siswa.id)}
+                                                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
-                                    <button
-                                        className="pagination-btn"
-                                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                        disabled={page === totalPages}
-                                    >
-                                        <ChevronRight size={18} />
-                                    </button>
-                                </div>
-                            )}
-                        </>
+                                </TableBody>
+                            </Table>
+                        </div>
                     )}
                 </section>
+
+                {/* Pagination */}
+                {totalPages > 1 && !isLoading && (
+                    <div className="flex items-center justify-center gap-2 mt-8">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                        >
+                            <ChevronLeft size={18} />
+                        </Button>
+                        <div className="flex items-center gap-1">
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                <Button
+                                    key={p}
+                                    variant={page === p ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setPage(p)}
+                                    className="w-10 h-10"
+                                >
+                                    {p}
+                                </Button>
+                            ))}
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                        >
+                            <ChevronRight size={18} />
+                        </Button>
+                    </div>
+                )}
             </main>
 
-            {/* Modal */}
-            {showModal && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal modal-lg" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3 className="modal-title">
-                                {editingSiswa ? 'Edit Data Siswa' : 'Tambah Siswa Baru'}
-                            </h3>
-                            <button className="modal-close" onClick={closeModal}>
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="nis">
-                                        <User size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        NIS
-                                    </label>
-                                    <input
-                                        id="nis"
-                                        type="text"
-                                        placeholder="Nomor Induk Siswa"
-                                        value={formData.nis}
-                                        onChange={(e) => setFormData({ ...formData, nis: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="nama">
-                                        <GraduationCap size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        Nama Lengkap
-                                    </label>
-                                    <input
-                                        id="nama"
-                                        type="text"
-                                        placeholder="Nama lengkap siswa"
-                                        value={formData.nama}
-                                        onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                            </div>
+            <SiswaDialog
+                isOpen={showModal}
+                onClose={() => setShowModal(false)}
+                onSubmit={handleSiswaSubmit}
+                editingSiswa={editingSiswa}
+            />
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="jenis_kelamin">Jenis Kelamin</label>
-                                    <select
-                                        id="jenis_kelamin"
-                                        value={formData.jenis_kelamin}
-                                        onChange={(e) => setFormData({ ...formData, jenis_kelamin: e.target.value as 'L' | 'P' })}
-                                        required
-                                    >
-                                        <option value="L">Laki-laki</option>
-                                        <option value="P">Perempuan</option>
-                                    </select>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="kelas">Kelas</label>
-                                    <input
-                                        id="kelas"
-                                        type="text"
-                                        placeholder="Contoh: XII IPA 1"
-                                        value={formData.kelas}
-                                        onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="tempat_lahir">
-                                        <MapPin size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        Tempat Lahir
-                                    </label>
-                                    <input
-                                        id="tempat_lahir"
-                                        type="text"
-                                        placeholder="Kota tempat lahir"
-                                        value={formData.tempat_lahir}
-                                        onChange={(e) => setFormData({ ...formData, tempat_lahir: e.target.value })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="tanggal_lahir">
-                                        <Calendar size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        Tanggal Lahir
-                                    </label>
-                                    <input
-                                        id="tanggal_lahir"
-                                        type="date"
-                                        value={formData.tanggal_lahir}
-                                        onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="alamat">
-                                    <MapPin size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                    Alamat
-                                </label>
-                                <textarea
-                                    id="alamat"
-                                    placeholder="Alamat lengkap siswa"
-                                    value={formData.alamat}
-                                    onChange={(e) => setFormData({ ...formData, alamat: e.target.value })}
-                                    rows={2}
-                                />
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label htmlFor="no_telepon">
-                                        <Phone size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        No. Telepon
-                                    </label>
-                                    <input
-                                        id="no_telepon"
-                                        type="tel"
-                                        placeholder="08xxxxxxxxxx"
-                                        value={formData.no_telepon}
-                                        onChange={(e) => setFormData({ ...formData, no_telepon: e.target.value })}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="email">
-                                        <Mail size={14} style={{ marginRight: '0.5rem', verticalAlign: '-2px' }} />
-                                        Email
-                                    </label>
-                                    <input
-                                        id="email"
-                                        type="email"
-                                        placeholder="email@example.com"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="tahun_masuk">Tahun Masuk</label>
-                                <input
-                                    id="tahun_masuk"
-                                    type="number"
-                                    placeholder="2024"
-                                    value={formData.tahun_masuk}
-                                    onChange={(e) => setFormData({ ...formData, tahun_masuk: parseInt(e.target.value) })}
-                                    min="2000"
-                                    max="2100"
-                                />
-                            </div>
-
-                            <div className="modal-actions">
-                                <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                                    Batal
-                                </button>
-                                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="spinning" size={18} />
-                                            Menyimpan...
-                                        </>
-                                    ) : (
-                                        editingSiswa ? 'Update Data' : 'Tambah Siswa'
-                                    )}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Overlay for mobile sidebar */}
+            {/* Sidebar Overlay */}
             {sidebarOpen && (
-                <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+                <div
+                    className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[99] lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
             )}
         </div>
     );
