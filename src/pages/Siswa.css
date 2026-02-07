@@ -1,0 +1,108 @@
+/* ===== Siswa Page Specific Styles ===== */
+.siswa-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.siswa-header .search-box {
+    flex: 1;
+    min-width: 250px;
+    max-width: 400px;
+}
+
+.siswa-stats {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.siswa-stats strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.siswa-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* ===== Table Actions ===== */
+.table-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ===== Large Modal ===== */
+.modal-lg {
+    max-width: 650px;
+}
+
+/* ===== Select Styling ===== */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .siswa-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .siswa-header .search-box {
+        max-width: 100%;
+    }
+
+    .siswa-stats {
+        text-align: center;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-lg {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+}
+
+/* ===== Mobile Table ===== */
+@media (max-width: 640px) {
+    .table-container {
+        border: none;
+        border-radius: 0;
+    }
+
+    table {
+        font-size: 0.85rem;
+    }
+
+    th,
+    td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Hide some columns on mobile */
+    th:nth-child(5),
+    td:nth-child(5),
+    th:nth-child(6),
+    td:nth-child(6) {
+        display: none;
+    }
+}
