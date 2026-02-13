@@ -1,97 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-card);
+  --color-card-foreground: var(--text-primary);
+  --color-popover: var(--bg-card);
+  --color-popover-foreground: var(--text-primary);
+  --color-primary: var(--text-primary);
+  --color-primary-foreground: var(--bg-primary);
+  --color-secondary: var(--bg-secondary);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted: var(--bg-secondary);
+  --color-muted-foreground: var(--text-muted);
+  --color-accent: var(--bg-secondary);
+  --color-accent-foreground: var(--text-primary);
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: var(--border-color);
+  --color-input: var(--border-color);
+  --color-ring: var(--text-primary);
+  
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
-    --primary: 0 0% 0%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 89%;
-    --input: 0 0% 89%;
-    --ring: 0 0% 0%;
-    --radius: 0.3rem;
+    /* Pure Zen White */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9f9f9;
+    --bg-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #404040;
+    --text-muted: #737373;
+    --border-color: #e5e5e5;
+    
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    
+    --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 100%;
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 12%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 12%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 100% 50%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 100%;
+    /* Pure Zen Black */
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #050505;
+    --text-primary: #ffffff;
+    --text-secondary: #a3a3a3;
+    --text-muted: #525252;
+    --border-color: #1a1a1a;
   }
-}
 
-/* Legacy/Compatibility fallback variables */
-:root,
-.dark {
-  --bg-primary: hsl(var(--background));
-  --bg-secondary: hsl(var(--secondary));
-  --bg-card: hsl(var(--card));
-  --bg-card-hover: hsl(var(--accent));
-  --accent-primary: hsl(var(--primary));
-  --accent-secondary: hsl(var(--primary));
-  --accent-gradient: hsl(var(--primary)); /* No gradient, just solid black/white */
-  --text-primary: hsl(var(--foreground));
-  --text-secondary: hsl(var(--muted-foreground));
-  --text-muted: hsl(var(--muted-foreground));
-  --border-color: hsl(var(--border));
-  --success: 0 0% 0%; /* Black for success in B&W theme */
-  --error: 0 100% 50%;
-  
-  /* Transition & Radius Defaults */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s ease;
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-}
+  * {
+    border-color: var(--border-color);
+  }
 
-/* ===== Reset & Base ===== */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  line-height: 1.6;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+  }
 }
 
 #root {

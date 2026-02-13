@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import {
     CheckCircle2,
-    Circle,
     Plus,
     Trash2,
     Edit2,
@@ -13,7 +13,10 @@ import {
     Users,
     LogOut,
     Menu,
-    ChevronRight
+    Search,
+    Sun,
+    Moon,
+    ClipboardList
 } from 'lucide-react';
 import type { Task } from '../services/api';
 import { taskApi } from '../services/api';
@@ -22,6 +25,7 @@ import './Dashboard.css';
 export default function DashboardPage() {
     const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
     const { user, logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -30,6 +34,7 @@ export default function DashboardPage() {
     const [formData, setFormData] = useState({ title: '', description: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         fetchTasks();
@@ -48,6 +53,13 @@ export default function DashboardPage() {
             setIsLoading(false);
         }
     };
+
+    const filteredTasks = useMemo(() => {
+        return tasks.filter(task => 
+            task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            task.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [tasks, searchQuery]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -127,208 +139,205 @@ export default function DashboardPage() {
     const pendingCount = tasks.filter(t => !t.completed).length;
 
     return (
-        <div className="dashboard">
-            {/* Sidebar */}
-            <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-                <div className="sidebar-header">
-                    <div className="sidebar-logo">
-                        <span className="logo-icon">✓</span>
-                        <span className="logo-text">Taskly</span>
+        <div className="dashboard-container">
+            {/* Sidebar with unique design */}
+            <aside className={`dashboard-sidebar ${sidebarOpen ? 'is-visible' : ''}`}>
+                <div className="sidebar-brand">
+                    <div className="brand-logo">
+                        <ClipboardList className="brand-icon" size={28} />
+                        <span className="brand-name">Taskly</span>
                     </div>
-                    <button className="sidebar-close" onClick={() => setSidebarOpen(false)}>
-                        <X size={20} />
-                    </button>
                 </div>
 
-                <nav className="sidebar-nav">
-                    <Link to="/dashboard" className="nav-item active">
-                        <ListTodo size={20} />
-                        <span>My Tasks</span>
-                        <ChevronRight size={16} className="nav-arrow" />
+                <nav className="nav-menu">
+                    <Link to="/dashboard" className="nav-link active">
+                        <div className="nav-inner">
+                            <ListTodo size={22} />
+                            <span>Dashboard</span>
+                        </div>
+                        <div className="active-dot" />
                     </Link>
-                    <Link to="/siswa" className="nav-item">
-                        <Users size={20} />
-                        <span>Data Siswa</span>
-                        <ChevronRight size={16} className="nav-arrow" />
+                    <Link to="/siswa" className="nav-link">
+                        <div className="nav-inner">
+                            <Users size={22} />
+                            <span>Students</span>
+                        </div>
                     </Link>
                 </nav>
 
-                <div className="sidebar-footer">
-                    <div className="user-info">
-                        <div className="user-avatar">
+                <div className="sidebar-profile">
+                    <div className="profile-card">
+                        <div className="profile-avatar">
                             {user?.name?.charAt(0).toUpperCase()}
                         </div>
-                        <div className="user-details">
-                            <span className="user-name">{user?.name}</span>
-                            <span className="user-email">{user?.email}</span>
+                        <div className="profile-info">
+                            <p className="profile-name">{user?.name}</p>
+                            <button className="btn-signout" onClick={logout}>
+                                <LogOut size={14} />
+                                Logout
+                            </button>
                         </div>
                     </div>
-                    <button className="btn-logout" onClick={logout}>
-                        <LogOut size={18} />
-                        <span>Logout</span>
-                    </button>
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="main-content">
-                <header className="main-header">
-                    <button className="menu-toggle" onClick={() => setSidebarOpen(true)}>
-                        <Menu size={24} />
-                    </button>
-                    <div>
-                        <h1>My Tasks</h1>
-                        <p className="header-subtitle">Manage your tasks efficiently</p>
+            {/* Main Surface */}
+            <main className="dashboard-main">
+                <header className="content-header">
+                    <div className="header-left">
+                        <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+                            <Menu size={24} />
+                        </button>
+                        <div className="welcome-text">
+                            <h2>Hello, {user?.name?.split(' ')[0]}!</h2>
+                            <p>Here's what's happening with your projects today.</p>
+                        </div>
                     </div>
-                    <button className="btn btn-primary" onClick={openCreateModal}>
-                        <Plus size={20} />
-                        <span>Add Task</span>
-                    </button>
+
+                    <div className="header-right">
+                        <button className="theme-switcher" onClick={toggleTheme} title="Toggle Theme">
+                            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                        </button>
+                        <button className="btn-add-primary" onClick={openCreateModal}>
+                            <Plus size={20} />
+                            <span>Create Task</span>
+                        </button>
+                    </div>
                 </header>
 
-
-                {/* Stats */}
-                <div className="stats-grid">
-                    <div className="stat-card">
-                        <div className="stat-icon stat-icon-total">
-                            <ListTodo size={24} />
+                <div className="dashboard-content">
+                    {/* Zen Stats Overlay */}
+                    <div className="bento-stats">
+                        <div className="bento-item">
+                            <p className="bento-label">Overall Tasks</p>
+                            <h3 className="bento-value">{tasks.length}</h3>
                         </div>
-                        <div className="stat-info">
-                            <span className="stat-value">{tasks.length}</span>
-                            <span className="stat-label">Total Tasks</span>
+                        <div className="bento-item">
+                            <p className="bento-label">Completed</p>
+                            <h3 className="bento-value">{completedCount}</h3>
+                            <div className="progress-bar">
+                                <div 
+                                    className="progress-fill" 
+                                    style={{ width: `${tasks.length ? (completedCount / tasks.length) * 100 : 0}%` }} 
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon stat-icon-completed">
-                            <CheckCircle2 size={24} />
-                        </div>
-                        <div className="stat-info">
-                            <span className="stat-value">{completedCount}</span>
-                            <span className="stat-label">Completed</span>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-icon stat-icon-pending">
-                            <Circle size={24} />
-                        </div>
-                        <div className="stat-info">
-                            <span className="stat-value">{pendingCount}</span>
-                            <span className="stat-label">Pending</span>
+                        <div className="bento-item">
+                            <p className="bento-label">In Progress</p>
+                            <h3 className="bento-value">{pendingCount}</h3>
                         </div>
                     </div>
-                </div>
 
-                {/* Task List */}
-                <section className="tasks-section">
-                    <h3 className="section-title">Task List</h3>
+                    {/* Simple Control Bar */}
+                    <div className="task-controls">
+                        <div className="search-wrap">
+                            <Search className="search-icon" size={18} />
+                            <input 
+                                type="text" 
+                                placeholder="Search tasks..." 
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
 
-                    {isLoading ? (
-                        <div className="loading-state">
-                            <Loader2 className="spinner-lg spinning" />
-                            <p>Loading tasks...</p>
-                        </div>
-                    ) : tasks.length === 0 ? (
-                        <div className="empty-state">
-                            <div className="empty-state-icon">📝</div>
-                            <h4 className="empty-state-title">No tasks yet</h4>
-                            <p>Create your first task to get started</p>
-                            <button className="btn btn-primary mt-3" onClick={openCreateModal}>
-                                <Plus size={20} />
-                                Create Task
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="task-list">
-                            {tasks.map((task, index) => (
-                                <div
-                                    key={task.id}
-                                    className={`task-card ${task.completed ? 'completed' : ''}`}
-                                    style={{ animationDelay: `${index * 0.05}s` }}
-                                >
-                                    <button
-                                        className="task-check"
-                                        onClick={() => handleToggleComplete(task)}
+                    {/* Task List */}
+                    <section className="task-board">
+                        {isLoading ? (
+                            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                <Loader2 className="spinning" size={40} />
+                                <p className="text-muted font-medium">Loading workspace...</p>
+                            </div>
+                        ) : filteredTasks.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-20 text-center gap-4">
+                                <ListTodo size={60} className="opacity-10" />
+                                <h4 className="font-bold">No tasks found</h4>
+                                <button className="btn-add-primary" onClick={openCreateModal}>
+                                    <Plus size={20} />
+                                    Initialize First Task
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="task-grid">
+                                {filteredTasks.map((task, index) => (
+                                    <div
+                                        key={task.id}
+                                        className={`task-element ${task.completed ? 'is-done' : ''}`}
+                                        style={{ '--index': index } as React.CSSProperties}
                                     >
-                                        {task.completed ? (
-                                            <CheckCircle2 className="check-icon checked" size={24} />
-                                        ) : (
-                                            <Circle className="check-icon" size={24} />
-                                        )}
-                                    </button>
-                                    <div className="task-content">
-                                        <h4 className="task-title">{task.title}</h4>
-                                        {task.description && (
-                                            <p className="task-description">{task.description}</p>
-                                        )}
+                                        <div className="task-header">
+                                            <button
+                                                className={`task-toggle ${task.completed ? 'checked' : ''}`}
+                                                onClick={() => handleToggleComplete(task)}
+                                            >
+                                                {task.completed && <CheckCircle2 size={16} />}
+                                            </button>
+                                            <div className="task-content">
+                                                <h4 className="task-name">{task.title}</h4>
+                                                {task.description && (
+                                                    <p className="task-info">{task.description}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="task-actions">
+                                            <button
+                                                className="action-btn"
+                                                onClick={() => openEditModal(task)}
+                                            >
+                                                <Edit2 size={14} />
+                                            </button>
+                                            <button
+                                                className="action-btn delete"
+                                                onClick={() => handleDeleteClick(task.id)}
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="task-actions">
-                                        <button
-                                            className="btn btn-icon btn-secondary"
-                                            onClick={() => openEditModal(task)}
-                                        >
-                                            <Edit2 size={16} />
-                                        </button>
-                                        <button
-                                            className="btn btn-icon btn-danger"
-                                            onClick={() => handleDeleteClick(task.id)}
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </section>
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                </div>
             </main>
 
-            {/* Create/Edit Modal */}
+            {/* Modern Modal System */}
             {showModal && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3 className="modal-title">
-                                {editingTask ? 'Edit Task' : 'Create New Task'}
-                            </h3>
-                            <button className="modal-close" onClick={closeModal}>
-                                <X size={24} />
+                <div className="modern-modal-overlay" onClick={closeModal}>
+                    <div className="modern-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modern-modal-header">
+                            <h3>{editingTask ? 'Refine Task' : 'New Objective'}</h3>
+                            <button className="close-btn" onClick={closeModal}>
+                                <X size={20} />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label htmlFor="title">Title</label>
+                        <form onSubmit={handleSubmit} className="modern-form">
+                            <div className="input-group">
+                                <label>Task Title</label>
                                 <input
-                                    id="title"
                                     type="text"
-                                    placeholder="Enter task title"
+                                    placeholder="What needs to be done?"
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     required
                                 />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="description">Description</label>
+                            <div className="input-group">
+                                <label>Context (Optional)</label>
                                 <textarea
-                                    id="description"
-                                    placeholder="Enter task description (optional)"
+                                    placeholder="Add some details..."
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     rows={4}
                                 />
                             </div>
-                            <div className="modal-actions">
-                                <button type="button" className="btn btn-secondary" onClick={closeModal}>
+                            <div className="modern-modal-footer">
+                                <button type="button" className="btn-plain" onClick={closeModal}>
                                     Cancel
                                 </button>
-                                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="spinning" size={18} />
-                                            Saving...
-                                        </>
-                                    ) : (
-                                        editingTask ? 'Update Task' : 'Create Task'
-                                    )}
+                                <button type="submit" className="btn-accent" disabled={isSubmitting}>
+                                    {isSubmitting ? <Loader2 className="spinning" size={18} /> : (editingTask ? 'Save Changes' : 'Initialize Task')}
                                 </button>
                             </div>
                         </form>
@@ -336,37 +345,31 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Modal */}
             {isDeleteDialogOpen && (
-                <div className="modal-overlay" onClick={() => setIsDeleteDialogOpen(false)}>
-                    <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
-                        <div className="modal-header">
-                            <h3 className="modal-title">Delete Task</h3>
-                            <button className="modal-close" onClick={() => setIsDeleteDialogOpen(false)}>
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <div className="modal-body p-4 text-center">
-                            <div className="mb-4 text-danger">
-                                <Trash2 size={48} className="mx-auto" />
+                <div className="modern-modal-overlay" onClick={() => setIsDeleteDialogOpen(false)}>
+                    <div className="modern-modal modal-danger" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-inner">
+                            <div className="danger-icon">
+                                <Trash2 size={32} />
                             </div>
-                            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
-                        </div>
-                        <div className="modal-actions">
-                            <button className="btn btn-secondary" onClick={() => setIsDeleteDialogOpen(false)}>
-                                Cancel
-                            </button>
-                            <button className="btn btn-danger" onClick={confirmDeleteTask}>
-                                Delete Task
-                            </button>
+                            <h3>Remove Task?</h3>
+                            <p>This will permanently erase the task from your board. This cannot be reversed.</p>
+                            <div className="modern-modal-footer">
+                                <button className="btn-plain" onClick={() => setIsDeleteDialogOpen(false)}>
+                                    Go Back
+                                </button>
+                                <button className="btn-danger-action" onClick={confirmDeleteTask}>
+                                    Erase Now
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* Overlay for mobile sidebar */}
             {sidebarOpen && (
-                <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+                <div className="modern-sidebar-overlay" onClick={() => setSidebarOpen(false)} />
             )}
         </div>
     );
