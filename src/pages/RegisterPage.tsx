@@ -131,11 +131,11 @@ export default function RegisterPage() {
                                     <input
                                         id="password"
                                         type="password"
-                                        placeholder="Create a password (min 6 characters)"
+                                        placeholder="Create a password (min 3 characters)"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        minLength={6}
+                                        minLength={3}
                                     />
                                 </div>
                             </div>
@@ -151,7 +151,7 @@ export default function RegisterPage() {
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         required
-                                        minLength={6}
+                                        minLength={3}
                                     />
                                 </div>
                             </div>

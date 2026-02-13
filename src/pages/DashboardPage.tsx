@@ -20,37 +20,23 @@ import { taskApi } from '../services/api';
 import './Dashboard.css';
 
 export default function DashboardPage() {
+    const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
     const { user, logout } = useAuth();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [formData, setFormData] = useState({ title: '', description: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
-
-    const getlistTask = async () => {
-        try {
-            const response = await taskApi.getAll();
-            if (response.success && response.data) {
-                setTasks(response.data);
-            }
-        } catch (error) {
-            console.error('Failed to fetch tasks:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-
-
-
 
     useEffect(() => {
         fetchTasks();
     }, []);
 
     const fetchTasks = async () => {
+        setIsLoading(true);
         try {
             const response = await taskApi.getAll();
             if (response.success && response.data) {
@@ -87,6 +73,27 @@ export default function DashboardPage() {
         }
     };
 
+    const handleDeleteClick = (id: number) => {
+        setCurrentTaskId(id);
+        setIsDeleteDialogOpen(true);
+    };
+
+    const confirmDeleteTask = async () => {
+        if (currentTaskId === null) return;
+
+        try {
+            const response = await taskApi.delete(currentTaskId);
+            if (response.success) {
+                setTasks(tasks.filter(t => t.id !== currentTaskId));
+            }
+        } catch (error) {
+            console.error('Failed to delete task:', error);
+        } finally {
+            setIsDeleteDialogOpen(false);
+            setCurrentTaskId(null);
+        }
+    };
+
     const handleToggleComplete = async (task: Task) => {
         try {
             const response = await taskApi.update(task.id, { completed: !task.completed });
@@ -95,19 +102,6 @@ export default function DashboardPage() {
             }
         } catch (error) {
             console.error('Failed to update task:', error);
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        if (!confirm('Are you sure you want to delete this task?')) return;
-
-        try {
-            const response = await taskApi.delete(id);
-            if (response.success) {
-                setTasks(tasks.filter(t => t.id !== id));
-            }
-        } catch (error) {
-            console.error('Failed to delete task:', error);
         }
     };
 
@@ -192,6 +186,7 @@ export default function DashboardPage() {
                     </button>
                 </header>
 
+
                 {/* Stats */}
                 <div className="stats-grid">
                     <div className="stat-card">
@@ -275,7 +270,7 @@ export default function DashboardPage() {
                                         </button>
                                         <button
                                             className="btn btn-icon btn-danger"
-                                            onClick={() => handleDelete(task.id)}
+                                            onClick={() => handleDeleteClick(task.id)}
                                         >
                                             <Trash2 size={16} />
                                         </button>
@@ -287,7 +282,7 @@ export default function DashboardPage() {
                 </section>
             </main>
 
-            {/* Modal */}
+            {/* Create/Edit Modal */}
             {showModal && (
                 <div className="modal-overlay" onClick={closeModal}>
                     <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -337,6 +332,34 @@ export default function DashboardPage() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {isDeleteDialogOpen && (
+                <div className="modal-overlay" onClick={() => setIsDeleteDialogOpen(false)}>
+                    <div className="modal modal-sm" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3 className="modal-title">Delete Task</h3>
+                            <button className="modal-close" onClick={() => setIsDeleteDialogOpen(false)}>
+                                <X size={24} />
+                            </button>
+                        </div>
+                        <div className="modal-body p-4 text-center">
+                            <div className="mb-4 text-danger">
+                                <Trash2 size={48} className="mx-auto" />
+                            </div>
+                            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn btn-secondary" onClick={() => setIsDeleteDialogOpen(false)}>
+                                Cancel
+                            </button>
+                            <button className="btn btn-danger" onClick={confirmDeleteTask}>
+                                Delete Task
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

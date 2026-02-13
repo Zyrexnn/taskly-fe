@@ -6,7 +6,7 @@ import { User as UserIcon, Lock, LogIn, Loader2, AlertCircle } from 'lucide-reac
 import './Auth.css';
 
 export default function LoginPage() {
-    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,7 @@ export default function LoginPage() {
         setError('');
         setIsLoading(true);
 
-        const result = await login(username, password);
+        const result = await login(identifier, password);
 
         if (result.success) {
             navigate('/dashboard');
@@ -78,15 +78,15 @@ export default function LoginPage() {
 
                         <form onSubmit={handleSubmit} className="auth-form">
                             <div className="form-group">
-                                <label htmlFor="username">Username / NIS</label>
+                                <label htmlFor="identifier">Username / Email</label>
                                 <div className="input-with-icon">
                                     <UserIcon className="input-icon" size={18} />
                                     <input
-                                        id="username"
+                                        id="identifier"
                                         type="text"
-                                        placeholder="Enter your username or NIS"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        placeholder="Enter your username or email"
+                                        value={identifier}
+                                        onChange={(e) => setIdentifier(e.target.value)}
                                         required
                                     />
                                 </div>
@@ -103,7 +103,7 @@ export default function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        minLength={6}
+                                        minLength={3}
                                     />
                                 </div>
                             </div>

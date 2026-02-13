@@ -222,8 +222,8 @@ export default function SiswaPage() {
                                             <TableCell>{siswa.nama}</TableCell>
                                             <TableCell>
                                                 <span className={`px-2 py-1 rounded-full text-xs font-semibold ${siswa.jenis_kelamin === 'L'
-                                                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                                        : 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400'
+                                                        ? 'bg-zinc-100 text-zinc-800 border border-zinc-200'
+                                                        : 'bg-zinc-800 text-zinc-100'
                                                     }`}>
                                                     {siswa.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
                                                 </span>
@@ -232,7 +232,7 @@ export default function SiswaPage() {
                                             <TableCell className="hidden md:table-cell text-muted-foreground">{siswa.no_telepon || '-'}</TableCell>
                                             <TableCell className="hidden md:table-cell text-muted-foreground">{siswa.tahun_masuk || '-'}</TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div className="flex justify-end gap-2 opacity-100 transition-opacity">
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"

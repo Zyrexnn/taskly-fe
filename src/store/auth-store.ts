@@ -6,7 +6,7 @@ type AuthUser = {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (identifier: string, password: string) => Promise<boolean>;
     logout: () => void;
     setuser: (user: User) => void;
     settoken: (token: string) => void;
@@ -17,9 +17,9 @@ export const useAuthStore = create<AuthUser>((set) => ({
     user: authApi.getCurrentUser(),
     token: null, // Token is handled by Cookies
     isAuthenticated: authApi.isAuthenticated(),
-    login: async (username, password) => {
+    login: async (identifier, password) => {
         try {
-            const response = await authApi.login({ username, password });
+            const response = await authApi.login({ identifier, password });
             if (response.success && response.data) {
                 set({
                     user: response.data.user,

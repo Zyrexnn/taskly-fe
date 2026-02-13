@@ -40,19 +40,16 @@
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: var(--accent-gradient);
+    background: var(--primary);
     border-radius: var(--radius-md);
     font-size: 1.25rem;
-    color: white;
+    color: var(--primary-foreground);
 }
 
 .sidebar-logo .logo-text {
     font-size: 1.5rem;
     font-weight: 800;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
 }
 
 .sidebar-close {
@@ -89,8 +86,8 @@
 }
 
 .nav-item.active {
-    background: var(--accent-gradient);
-    color: rgb(0, 0, 0);
+    background: var(--primary);
+    color: var(--primary-foreground);
 }
 
 .nav-arrow {
@@ -120,13 +117,13 @@
     width: 44px;
     height: 44px;
     border-radius: 50%;
-    background: var(--accent-gradient);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 1.125rem;
-    color: white;
+    color: var(--primary-foreground);
 }
 
 .user-details {
@@ -167,9 +164,9 @@
 }
 
 .btn-logout:hover {
-    background: var(--error-bg);
-    border-color: var(--error);
-    color: var(--error);
+    background: #000;
+    border-color: #000;
+    color: #fff;
 }
 
 /* ===== Main Content ===== */
@@ -241,18 +238,18 @@
 }
 
 .stat-icon-total {
-    background: var(--info-bg);
-    color: var(--info);
+    background: #f3f4f6;
+    color: #111827;
 }
 
 .stat-icon-completed {
-    background: var(--success-bg);
-    color: var(--success);
+    background: #e5e7eb;
+    color: #111827;
 }
 
 .stat-icon-pending {
-    background: var(--warning-bg);
-    color: var(--warning);
+    background: #000;
+    color: #fff;
 }
 
 .stat-info {
@@ -308,20 +305,21 @@
 
 .task-card {
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.25rem;
-    background: var(--bg-secondary);
+    align-items: center; /* Center items vertically */
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-normal);
     animation: fadeIn 0.3s ease forwards;
-    opacity: 0;
+    opacity: 1; /* Ensure visible */
 }
 
 .task-card:hover {
-    border-color: var(--border-hover);
-    background: var(--bg-card-hover);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: var(--bg-card);
 }
 
 .task-card.completed {
@@ -377,14 +375,26 @@
 
 .task-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     flex-shrink: 0;
-    opacity: 0;
-    transition: opacity var(--transition-fast);
 }
 
-.task-card:hover .task-actions {
-    opacity: 1;
+.task-actions .btn-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border-color);
+}
+
+.task-actions .btn-danger {
+    background: #fff;
+    color: #ef4444;
+    border-color: #fee2e2;
+}
+
+.task-actions .btn-danger:hover {
+    background: #ef4444;
+    color: #fff;
+    border-color: #ef4444;
 }
 
 /* ===== Modal Actions ===== */

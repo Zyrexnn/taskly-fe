@@ -3,7 +3,7 @@ import type { InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
 
 // API Base Configuration
-const API_BASE_URL = 'https://api-taskly.fachry.dev/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Create Axios Instance
 const api = axios.create({
@@ -32,7 +32,10 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             Cookies.remove('token');
             localStorage.removeItem('user');
-            window.location.href = '/login';
+            // Prevent recursive redirects if already on login page
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
         }
         return Promise.reject(error);
     }
@@ -65,7 +68,7 @@ export interface RegisterRequest {
 }
 
 export interface LoginRequest {
-    username: string;
+    identifier: string;
     password: string;
 }
 
@@ -75,9 +78,9 @@ export interface Task {
     title: string;
     description: string;
     completed: boolean;
-    userId: number;
-    createdAt?: string;
-    updatedAt?: string;
+    user_id: number;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface CreateTaskRequest {
