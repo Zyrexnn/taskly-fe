@@ -37,9 +37,8 @@ export default function LoginPage() {
                     <div className="auth-branding-content">
                         <div className="auth-logo">
                             <span className="logo-icon">✓</span>
-                            <span className="logo-text">Taskly</span>
+                            <span className="logo-text">TASKLY</span>
                         </div>
-                        <h1 className="auth-tagline">Manage your tasks with ease</h1>
                         <p className="auth-description">
                             Stay organized, boost productivity, and never miss a deadline with our
                             intuitive task management platform.
@@ -50,7 +49,7 @@ export default function LoginPage() {
                                 <span>Task Management</span>
                             </div>
                             <div className="feature-item">
-                                <span className="feature-icon">👨‍🎓</span>
+                                <span className="feature-icon">🤵</span>
                                 <span>Student Records</span>
                             </div>
                             <div className="feature-item">
@@ -58,6 +57,7 @@ export default function LoginPage() {
                                 <span>Secure Authentication</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
 

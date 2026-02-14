@@ -18,7 +18,17 @@ import {
     Moon,
     ClipboardList
 } from 'lucide-react';
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "../components/ui/pagination";
+
 import type { Task } from '../services/api';
+
 import { taskApi } from '../services/api';
 import './Dashboard.css';
 
@@ -35,6 +45,9 @@ export default function DashboardPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
+
 
     useEffect(() => {
         fetchTasks();
@@ -60,6 +73,19 @@ export default function DashboardPage() {
             task.description?.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }, [tasks, searchQuery]);
+
+    const paginatedTasks = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredTasks.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredTasks, currentPage, itemsPerPage]);
+
+    const totalPages = Math.ceil(filteredTasks.length / itemsPerPage);
+
+    // Reset to page 1 when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -259,7 +285,7 @@ export default function DashboardPage() {
                             </div>
                         ) : (
                             <div className="task-grid">
-                                {filteredTasks.map((task, index) => (
+                                {paginatedTasks.map((task, index) => (
                                     <div
                                         key={task.id}
                                         className={`task-element ${task.completed ? 'is-done' : ''}`}
@@ -299,6 +325,54 @@ export default function DashboardPage() {
                             </div>
                         )}
                     </section>
+
+                    {/* Shadcn Pagination */}
+                    {totalPages > 1 && (
+                        <div className="mt-8">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious 
+                                            href="#" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (currentPage > 1) setCurrentPage(currentPage - 1);
+                                            }}
+                                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
+                                    
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                        <PaginationItem key={page}>
+                                            <PaginationLink 
+                                                href="#" 
+                                                isActive={currentPage === page}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setCurrentPage(page);
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                {page}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+
+                                    <PaginationItem>
+                                        <PaginationNext 
+                                            href="#" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                                            }}
+                                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    )}
+
                 </div>
             </main>
 

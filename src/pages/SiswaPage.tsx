@@ -12,13 +12,22 @@ import {
     LogOut,
     Menu,
     Search,
-    ChevronLeft,
-    ChevronRight,
     Sun,
     Moon,
     ClipboardList
 } from 'lucide-react';
+
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "../components/ui/pagination";
+
 import type { Siswa, CreateSiswaRequest } from '../services/api';
+
 import { siswaApi } from '../services/api';
 import {
     Table,
@@ -261,36 +270,53 @@ export default function SiswaPage() {
                         )}
                     </section>
 
-                    {/* Pagination */}
+                    {/* Shadcn Pagination */}
                     {totalPages > 1 && !isLoading && (
-                        <div className="flex items-center justify-center gap-3 mt-10">
-                            <button
-                                className="action-btn"
-                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
-                            <div className="flex items-center gap-2">
-                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                                    <button
-                                        key={p}
-                                        onClick={() => setPage(p)}
-                                        className={`w-10 h-10 rounded-xl font-bold transition-all ${page === p ? "bg-text-primary text-bg-primary" : "bg-bg-card hover:bg-bg-secondary text-text-muted"}`}
-                                    >
-                                        {p}
-                                    </button>
-                                ))}
-                            </div>
-                            <button
-                                className="action-btn"
-                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                            >
-                                <ChevronRight size={20} />
-                            </button>
+                        <div className="mt-10">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious 
+                                            href="#" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (page > 1) setPage(page - 1);
+                                            }}
+                                            className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                        <PaginationItem key={p}>
+                                            <PaginationLink 
+                                                href="#" 
+                                                isActive={page === p}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setPage(p);
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                {p}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+
+                                    <PaginationItem>
+                                        <PaginationNext 
+                                            href="#" 
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                if (page < totalPages) setPage(page + 1);
+                                            }}
+                                            className={page === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                        />
+                                    </PaginationItem>
+                                </PaginationContent>
+                            </Pagination>
                         </div>
                     )}
+
                 </div>
             </main>
 

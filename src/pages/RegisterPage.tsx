@@ -47,27 +47,27 @@ export default function RegisterPage() {
                     <div className="auth-branding-content">
                         <div className="auth-logo">
                             <span className="logo-icon">✓</span>
-                            <span className="logo-text">Taskly</span>
+                            <span className="logo-text">TASKLY</span>
                         </div>
-                        <h1 className="auth-tagline">Start your journey today</h1>
                         <p className="auth-description">
-                            Join thousands of users who trust Taskly to manage their tasks and
-                            stay productive every day.
+                            Stay organized, boost productivity, and never miss a deadline with our
+                            intuitive task management platform.
                         </p>
                         <div className="auth-features">
                             <div className="feature-item">
-                                <span className="feature-icon">🚀</span>
-                                <span>Quick Setup</span>
+                                <span className="feature-icon">📋</span>
+                                <span>Task Management</span>
                             </div>
                             <div className="feature-item">
-                                <span className="feature-icon">💯</span>
-                                <span>Free to Use</span>
+                                <span className="feature-icon">🤵</span>
+                                <span>Student Records</span>
                             </div>
                             <div className="feature-item">
-                                <span className="feature-icon">⚡</span>
-                                <span>Instant Access</span>
+                                <span className="feature-icon">🔒</span>
+                                <span>Secure Authentication</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
