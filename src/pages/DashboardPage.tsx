@@ -16,7 +16,8 @@ import {
     Search,
     Sun,
     Moon,
-    ClipboardList
+    ClipboardList,
+    MessageCircle
 } from 'lucide-react';
 import {
     Pagination,
@@ -187,6 +188,12 @@ export default function DashboardPage() {
                         <div className="nav-inner">
                             <Users size={22} />
                             <span>Students</span>
+                        </div>
+                    </Link>
+                    <Link to="/chat" className="nav-link">
+                        <div className="nav-inner">
+                            <MessageCircle size={22} />
+                            <span>Global Chat</span>
                         </div>
                     </Link>
                 </nav>

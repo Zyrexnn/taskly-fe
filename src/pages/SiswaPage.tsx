@@ -14,7 +14,8 @@ import {
     Search,
     Sun,
     Moon,
-    ClipboardList
+    ClipboardList,
+    MessageCircle
 } from 'lucide-react';
 
 import {
@@ -143,6 +144,12 @@ export default function SiswaPage() {
                             <span>Students</span>
                         </div>
                         <div className="active-dot" />
+                    </Link>
+                    <Link to="/chat" className="nav-link">
+                        <div className="nav-inner">
+                            <MessageCircle size={22} />
+                            <span>Global Chat</span>
+                        </div>
                     </Link>
                 </nav>
 

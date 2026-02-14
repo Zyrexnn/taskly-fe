@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import SiswaPage from './pages/SiswaPage';
+import GlobalChatPage from './pages/GlobalChatPage';
+import ChatBot from './components/ChatBot';
 // using global index.css imported in main.tsx
 
 function App() {
@@ -36,11 +38,20 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <GlobalChatPage />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Default Redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <ChatBot />
       </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
@@ -48,3 +59,4 @@ function App() {
 }
 
 export default App;
+
