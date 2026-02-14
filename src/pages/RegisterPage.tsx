@@ -44,32 +44,13 @@ export default function RegisterPage() {
             <div className="auth-container">
                 {/* Left Side - Branding */}
                 <div className="auth-branding">
-                    <div className="auth-branding-content">
-                        <div className="auth-logo">
-                            <span className="logo-icon">✓</span>
-                            <span className="logo-text">TASKLY</span>
-                        </div>
-                        <p className="auth-description">
-                            Stay organized, boost productivity, and never miss a deadline with our
-                            intuitive task management platform.
-                        </p>
-                        <div className="auth-features">
-                            <div className="feature-item">
-                                <span className="feature-icon">📋</span>
-                                <span>Task Management</span>
-                            </div>
-                            <div className="feature-item">
-                                <span className="feature-icon">🤵</span>
-                                <span>Student Records</span>
-                            </div>
-                            <div className="feature-item">
-                                <span className="feature-icon">🔒</span>
-                                <span>Secure Authentication</span>
-                            </div>
-                        </div>
-
-                    </div>
+                    <img 
+                        src="/Violet_Evergarden.webp" 
+                        alt="Branding" 
+                        className="auth-branding-image"
+                    />
                 </div>
+
 
                 {/* Right Side - Form */}
                 <div className="auth-form-section">
